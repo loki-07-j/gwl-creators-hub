@@ -20,6 +20,9 @@ export default defineConfig({
   preview: {
     port: 3001,
     host: true,
+    // Domains allowed to reach the preview server (DNS-rebinding protection).
+    // A leading dot also allows all subdomains of that domain.
+    allowedHosts: ['.growwithloki.com', 'hub.growwithloki.com', 'localhost'],
     proxy: {
       '/api': { target: 'http://localhost:5001', changeOrigin: true },
       '/uploads': { target: 'http://localhost:5001', changeOrigin: true },
