@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /$
+Allow: /assets/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /signin
+Disallow: /signup
+Disallow: /api/
+
+Sitemap: https://gwlhub.com/sitemap.xml

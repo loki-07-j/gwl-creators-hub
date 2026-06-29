@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build Output
+dist/
+build/
+**/dist/
+**/build/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+**/.vscode/
+
+# Runtime Uploads
+uploads/
+
+# Logs
+*.log
+
+# Cache
+.cache/
+.turbo/
+
+# Local Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Deployment
+.vercel/
+.netlify/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Misc
+.thumbnail
+
+# NOTE: product-content/ is intentionally NOT ignored.
+# Product banners, covers, gallery images and docs are served by the backend
+# from the local product-content folder (no external object storage yet), so
+# the directory must be committed and shipped with the deployment.

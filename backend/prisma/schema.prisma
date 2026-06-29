@@ -1,0 +1,514 @@
+// GWL Creators Hub — data model
+// Controller -> Service -> Repository -> (Prisma) -> PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────────── Enums ──────────────────────────────────────
+
+enum UserRole {
+  MEMBER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+  BLOCKED
+}
+
+enum MembershipTier {
+  NONE
+  LIFETIME
+}
+
+enum ProductStatus {
+  PUBLISHED
+  DRAFT
+  SCHEDULED
+  ARCHIVED
+}
+
+enum BundleStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum CouponType {
+  PERCENT
+  FIXED
+}
+
+enum CouponScope {
+  ALL_PRODUCTS
+  ALL_BUNDLES
+  PRODUCT
+  FIRST_ORDER
+  REFERRAL
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum ReferralStatus {
+  PENDING
+  REWARDED
+}
+
+enum TicketType {
+  BUG
+  FEATURE
+  BUSINESS
+  GENERAL
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum NotificationCategory {
+  PRODUCTS
+  OFFERS
+  SYSTEM
+}
+
+enum AnnouncementType {
+  SALE
+  MAINTENANCE
+  UPDATE
+  HOLIDAY
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  PUBLISH
+  LOGIN
+  LOGOUT
+}
+
+// ──────────────────────────── Identity ────────────────────────────────────
+
+model User {
+  id             String         @id @default(cuid())
+  name           String
+  email          String         @unique
+  passwordHash   String
+  role           UserRole       @default(MEMBER)
+  teamRole       String?
+  status         UserStatus     @default(ACTIVE)
+  membership     MembershipTier @default(NONE)
+  memberSince    DateTime?
+  country        String?        @default("India")
+  phone          String?
+  avatarUrl      String?
+  lifetimeSaved  Int            @default(0) // rupees saved via member pricing
+  referralCode   String?        @unique
+
+  refreshTokens  RefreshToken[]
+  passwordResets PasswordReset[]
+  entitlements   Entitlement[]
+  wishlist       WishlistItem[]
+  orders         Order[]
+  invoices       Invoice[]
+  notifications  Notification[]
+  ticketsCreated SupportTicket[]
+  referralsMade  Referral[]      @relation("Referrer")
+  auditLogs      AuditLog[]
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([role])
+  @@index([status])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model SignupInvite {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  role      UserRole @default(MEMBER)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ──────────────────────────── Catalog ─────────────────────────────────────
+
+model Product {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  icon           String         @default("📦")
+  bg             String         @default("linear-gradient(135deg,#06181a,#040c0d)")
+  category       String         @default("General")
+  tags           String[]       @default([])
+  version        String         @default("v1.0")
+  sortOrder      Int            @default(0) // admin drag-to-reorder display position
+  fileCount      Int            @default(0)
+  sizeLabel      String?        @default("")
+  status         ProductStatus  @default(DRAFT)
+
+  priceOriginal  Int            @default(0)
+  priceOffer     Int            @default(0)
+  priceMember    Int            @default(0)
+  savingsBadge   String?
+
+  shortDesc      String?
+  benefits       String?
+  included       String?
+
+  thumbnailUrl   String?
+  heroUrl        String?
+  previewVideoUrl String?
+
+  seoTitle       String?
+  metaDescription String?
+  keywords       String?
+
+  downloadLink   String?        @default("#")
+  paymentLink    String?        @default("#")
+  purchaseCode   String?        // members redeem this code to unlock the product
+  platform       String?        @default("All platforms")
+
+  publishDate    DateTime?
+
+  releases       ProductRelease[]
+  entitlements   Entitlement[]
+  wishlistItems  WishlistItem[]
+  orderItems     OrderItem[]
+  bundleItems    BundleItem[]
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([sortOrder])
+}
+
+model ProductRelease {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  version   String
+  changes   String[] @default([])
+  dot       String?  @default("#36b6c9")
+  releasedAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Bundle {
+  id            String       @id @default(cuid())
+  name          String
+  icon          String       @default("🎁")
+  description   String?
+  priceOriginal Int          @default(0)
+  price         Int          @default(0)
+  status        BundleStatus @default(ACTIVE)
+  active        Boolean      @default(true)
+
+  items         BundleItem[]
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model BundleItem {
+  id        String  @id @default(cuid())
+  bundleId  String
+  bundle    Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([bundleId, productId])
+}
+
+model BonusProduct {
+  id           String   @id @default(cuid())
+  name         String
+  icon         String   @default("🎁")
+  bg           String   @default("linear-gradient(135deg,#1a1233,#0d0a16)")
+  description  String?
+  downloadLink String?  @default("#")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ──────────────────────────── Commerce ────────────────────────────────────
+
+model Coupon {
+  id         String      @id @default(cuid())
+  code       String      @unique
+  type       CouponType  @default(PERCENT)
+  value      Int         @default(0) // percent (0-100) or fixed rupees
+  scope      CouponScope @default(ALL_PRODUCTS)
+  scopeLabel String?     @default("All products")
+  autoApply  Boolean     @default(false)
+  active     Boolean     @default(true)
+  usageCount Int         @default(0)
+  expiresAt  DateTime?
+
+  orders     Order[]
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderNumber  String      @unique
+  userId       String?
+  user         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName String
+  customerEmail String
+  amount       Int         @default(0)
+  status       OrderStatus @default(PENDING)
+  couponId     String?
+  coupon       Coupon?     @relation(fields: [couponId], references: [id], onDelete: SetNull)
+
+  items        OrderItem[]
+  invoice      Invoice?
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  label      String
+  unitPrice  Int      @default(0)
+  quantity   Int      @default(1)
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  invoiceNumber String   @unique
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  amount        Int      @default(0)
+  issuedAt      DateTime @default(now())
+}
+
+model Entitlement {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  grantedAt  DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+// ──────────────────────────── Engagement ──────────────────────────────────
+
+model Notification {
+  id        String               @id @default(cuid())
+  userId    String?
+  user      User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  icon      String               @default("🔔")
+  iconBg    String               @default("rgba(42,150,166,.15)")
+  title     String
+  body      String?
+  category  NotificationCategory @default(SYSTEM)
+  read      Boolean              @default(false)
+  createdAt DateTime             @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model Referral {
+  id          String         @id @default(cuid())
+  referrerId  String
+  referrer    User           @relation("Referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  refereeName String
+  refereeEmail String?
+  status      ReferralStatus @default(PENDING)
+  rewardAmount Int           @default(0)
+  createdAt   DateTime       @default(now())
+
+  @@index([referrerId])
+}
+
+model SupportTicket {
+  id        String       @id @default(cuid())
+  ticketNo  String       @unique
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      TicketType   @default(GENERAL)
+  product   String?
+  message   String
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([status])
+}
+
+// ──────────────────────────── Content / CMS ───────────────────────────────
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  initial   String   @default("?")
+  avatarBg  String   @default("#2A96A6")
+  stars     Int      @default(5)
+  text      String
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Announcement {
+  id        String           @id @default(cuid())
+  message   String
+  type      AnnouncementType @default(UPDATE)
+  schedule  String?
+  active    Boolean          @default(true)
+  sortOrder Int              @default(0)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String?
+  category  String   @default("General")
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LandingSection {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  enabled   Boolean  @default(true)
+  sortOrder Int      @default(0)
+}
+
+model MediaFile {
+  id        String   @id @default(cuid())
+  name      String
+  icon      String   @default("📄")
+  iconBg    String   @default("rgba(42,150,166,.12)")
+  sizeLabel String?
+  sizeBytes Int      @default(0)
+  url       String?
+  mimeType  String?
+  createdAt DateTime @default(now())
+}
+
+// ──────────────────────────── System / RBAC ───────────────────────────────
+
+model Role {
+  id          String       @id @default(cuid())
+  key         String       @unique
+  name        String
+  locked      Boolean      @default(false)
+  permissions Permission[]
+}
+
+model Permission {
+  id      String @id @default(cuid())
+  roleId  String
+  role    Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  module  String
+  allowed Boolean @default(false)
+
+  @@unique([roleId, module])
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  actorId   String?
+  actor     User?       @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorName String
+  action    AuditAction
+  change    String
+  ip        String?
+  createdAt DateTime    @default(now())
+
+  @@index([createdAt])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  group     String   // general | payments | email | membership | security | toggles | seo
+  key       String
+  value     String?
+  label     String?
+  updatedAt DateTime @updatedAt
+
+  @@unique([group, key])
+}

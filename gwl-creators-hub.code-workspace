@@ -1,0 +1,17 @@
+{
+  "folders": [
+    { "name": "backend", "path": "backend" },
+    { "name": "frontend", "path": "frontend" },
+    { "name": "root", "path": "." }
+  ],
+  "settings": {
+    // Per-folder .vscode/settings.json each pin their own workspace TypeScript
+    // (backend/ and frontend/ both ship 5.9.x). Those take precedence per active
+    // file, so no global tsdk is set here.
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true
+    }
+  }
+}
