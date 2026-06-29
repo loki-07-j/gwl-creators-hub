@@ -13,13 +13,13 @@ function required(key: string, fallback?: string): string {
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   isProd: process.env.NODE_ENV === 'production',
-  port: parseInt(process.env.PORT ?? '4000', 10),
+  port: parseInt(process.env.PORT ?? '5001', 10),
   apiPrefix: process.env.API_PREFIX ?? '/api/v1',
-  corsOrigin: (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+  corsOrigin: (process.env.CORS_ORIGIN ?? 'http://localhost:3001')
     .split(',')
     .map((s) => s.trim()),
   // Public URL of the frontend app — used to build links inside emails.
-  appUrl: process.env.APP_URL ?? 'http://localhost:5173',
+  appUrl: process.env.APP_URL ?? 'http://localhost:3001',
 
   databaseUrl: required('DATABASE_URL'),
 

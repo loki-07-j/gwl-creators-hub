@@ -25,7 +25,7 @@ cd backend
 npm install
 npm run db:push     # create tables (already applied to the configured DB)
 npm run db:seed     # load demo data (idempotent — clears & reseeds)
-npm run dev         # http://localhost:4000/api/v1
+npm run dev         # http://localhost:5001/api/v1
 ```
 
 Other scripts: `npm run build`, `npm start`, `npm run typecheck`, `npm run prisma:studio`.
@@ -38,7 +38,7 @@ The database URL is in `backend/.env`. Note the password's `@` is URL-encoded
 ```bash
 cd frontend
 npm install
-npm run dev         # http://localhost:5173  (proxies /api → :4000)
+npm run dev         # http://localhost:3001  (proxies /api → :5001)
 ```
 
 Other scripts: `npm run build`, `npm run preview`, `npm run typecheck`.
