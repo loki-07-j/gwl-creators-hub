@@ -1,6 +1,9 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-export const API_BASE = '/api/v1';
+// Backend API base. Configurable via VITE_API_URL (frontend/.env):
+//  - relative "/api/v1"                      → uses the Vite dev proxy (same-origin)
+//  - absolute "http://localhost:5001/api/v1" → calls the backend host:port directly
+export const API_BASE = import.meta.env.VITE_API_URL ?? '/api/v1';
 
 export const api = axios.create({
   baseURL: API_BASE,
