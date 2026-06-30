@@ -95,6 +95,11 @@ const hexA = (hex: string, a: number) => { const n = parseInt(hex.slice(1), 16);
 const fmt = (n: number) => (n >= 1000 ? (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k' : '' + n);
 const pad = (n: number) => String(n).padStart(2, '0');
 const shortName = (name: string) => name.replace('Creators Research Hub', 'Research').replace('Luxury Videos Hub', 'Videos').replace(' Hub', '');
+const slug = (name: string) => 'prod-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+/* Trust badges shown under every product (and the membership card) */
+const productPerks = ['Lifetime access', 'One-time payment', '24×7 email support', 'Secure checkout (Razorpay)', 'Instant access'];
+const SUPPORT_EMAIL = 'growwithloki@gmail.com';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -178,44 +183,67 @@ export default function Landing() {
 
         {/* TOP NAV */}
         <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60, backdropFilter: 'blur(18px)', background: 'rgba(11,15,20,.72)', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
-            <a href="#top" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
+          {/* TOP MARKETING TAGLINE BAR */}
+          <div className="promobar" style={{ padding: '7px 16px', background: 'linear-gradient(90deg,rgba(244,197,66,.13),rgba(42,150,166,.13))', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
+            <div className="promo-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'nowrap', gap: 7, overflowX: 'auto', fontSize: 12.5, fontWeight: 700, color: '#dfe5ee', letterSpacing: '.02em', whiteSpace: 'nowrap' }}>
+              <span style={{ color: '#00C853' }}>✓</span> Pay Once
+              <span style={{ color: '#5a6675', fontWeight: 400 }}>·</span>
+              <b style={{ color: '#F4C542' }}><span style={{ color: '#00C853' }}>✓</span> Lifetime Access</b>
+              <span style={{ color: '#5a6675', fontWeight: 400 }}>·</span>
+              <span style={{ color: '#00C853' }}>✓</span> 24×7 Support
+            </div>
+          </div>
+          <div className="navwrap" style={{ maxWidth: 1280, margin: '0 auto', padding: '10px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
+            <a href="#top" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', flexShrink: 0 }}>
               <img src="/assets/gwl-logo.png" alt="GWL" style={{ width: 42, height: 42, borderRadius: 11, objectFit: 'cover' }} />
               <span style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 18, letterSpacing: '-.02em', color: '#fff' }}>GWL <span style={{ color: '#F4C542' }}>Creators Hub</span></span>
             </a>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div className="livechip" style={{ display: 'none', alignItems: 'center', gap: 8, padding: '7px 13px', borderRadius: 999, background: 'rgba(0,200,83,.1)', border: '1px solid rgba(0,200,83,.25)' }}>
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#00C853', boxShadow: '0 0 8px #00C853', animation: 'pulseGlow 1.6s infinite' }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#7Cffb0' }}>2,418 online</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexShrink: 0 }}>
+              <div className="livechip" style={{ display: 'none', alignItems: 'center', gap: 7 }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d27b', boxShadow: '0 0 7px rgba(52,210,123,.7)', animation: 'pulseGlow 1.8s infinite' }} />
+                <span style={{ fontSize: 13, fontWeight: 500, color: '#9aa6b2', letterSpacing: '.01em' }}>2,418 online</span>
               </div>
-              <button onClick={() => navigate('/signin')} className="nav-signin" style={{ cursor: 'pointer', fontFamily: '"Plus Jakarta Sans"', fontWeight: 600, fontSize: 14, color: '#fff', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 999, padding: '10px 20px', transition: 'all .2s' }}>Sign In</button>
+              <button onClick={() => navigate('/signin')} className="nav-signin" style={{ cursor: 'pointer', fontFamily: '"Plus Jakarta Sans"', fontWeight: 600, fontSize: 14, color: '#dfe5ee', background: 'transparent', border: 'none', borderRadius: 999, padding: '10px 14px', transition: 'all .2s', whiteSpace: 'nowrap' }}>Sign In</button>
+              <button onClick={() => scrollTo('products')} className="nav-cta" style={{ cursor: 'pointer', fontFamily: '"Plus Jakarta Sans"', fontWeight: 700, fontSize: 14, letterSpacing: '.01em', color: '#F4C542', background: 'transparent', border: 'none', borderRadius: 999, padding: '10px 14px', transition: 'all .18s', whiteSpace: 'nowrap' }}>Get Access</button>
             </div>
           </div>
         </header>
         <div id="top" />
 
         {/* HERO */}
-        <section className="herogrid" style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', padding: '140px 28px 40px', display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 48, alignItems: 'center' }}>
+        <section className="herogrid" style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', padding: '124px 28px 40px', display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 48, alignItems: 'center' }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '7px 14px', borderRadius: 999, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', marginBottom: 26 }}>
-              <span style={{ fontSize: 13 }}>🔥</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#A8B3C2' }}>Trusted by 12,000+ creators worldwide</span>
-            </div>
-            <h1 style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 64, lineHeight: 1.02, letterSpacing: '-.035em', marginBottom: 22 }}>
-              Create Faster.<br /><span style={{ background: 'linear-gradient(100deg,#2A96A6,#F4C542)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Grow Smarter.</span>
+            <h1 style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 54, lineHeight: 1.0, letterSpacing: '-.045em', marginBottom: 18 }}>
+              <span style={{ display: 'block', color: '#fff' }}>Create Faster.</span>
+              <span style={{ display: 'block', background: 'linear-gradient(96deg,#2A96A6 10%,#36b6c9 45%,#F4C542 100%)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Grow Smarter.</span>
             </h1>
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: '#A8B3C2', maxWidth: 520, marginBottom: 30 }}>Premium digital assets designed for creators, freelancers and businesses. Save hundreds of hours with ready-to-use videos, premium websites, AI prompts, business ideas and exclusive creator resources.</p>
-            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 30 }}>
-              <button onClick={() => scrollTo('products')} className="btn-primary" style={{ cursor: 'pointer', fontFamily: 'Sora', fontWeight: 700, fontSize: 16, color: '#06222a', background: 'linear-gradient(95deg,#2A96A6,#36b6c9)', border: 'none', borderRadius: 14, padding: '16px 30px', boxShadow: '0 12px 30px -8px rgba(42,150,166,.6)' }}>Explore Products →</button>
-              <button onClick={openMembership} style={{ cursor: 'pointer', fontFamily: 'Sora', fontWeight: 700, fontSize: 16, color: '#fff', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.16)', borderRadius: 14, padding: '16px 28px', backdropFilter: 'blur(8px)' }}>Become Lifetime Member</button>
+            <p style={{ fontSize: 16, lineHeight: 1.55, color: '#A8B3C2', maxWidth: 500, marginBottom: 26 }}>Premium digital assets designed for creators, freelancers and businesses. Save hundreds of hours with ready-to-use videos, premium websites, AI prompts, business ideas and exclusive creator resources.</p>
+
+            {/* ZONE 1 — actions (solid buttons) */}
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 26 }}>
+              <button onClick={() => scrollTo('products')} className="btn-primary" style={{ cursor: 'pointer', fontFamily: 'Sora', fontWeight: 700, fontSize: 15, color: '#06222a', background: 'linear-gradient(95deg,#2A96A6,#36b6c9)', border: 'none', borderRadius: 13, padding: '14px 26px', boxShadow: '0 12px 30px -8px rgba(42,150,166,.6)' }}>Explore Products →</button>
+              <button onClick={openMembership} style={{ cursor: 'pointer', fontFamily: 'Sora', fontWeight: 700, fontSize: 15, color: '#fff', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.16)', borderRadius: 13, padding: '14px 24px', backdropFilter: 'blur(8px)' }}>Become Lifetime Member</button>
             </div>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              {['Commercial License', 'Instant Download', 'Lifetime Updates', 'Premium Quality', '24×7 Support'].map((chip) => (
-                <div key={chip} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 13px', borderRadius: 999, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)' }}>
-                  <span style={{ color: '#2A96A6', fontSize: 14 }}>✓</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#A8B3C2' }}>{chip}</span>
-                </div>
+
+            {/* ZONE 2 — feature highlights (plain inline list, no pills) */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', rowGap: 11, columnGap: 24, marginBottom: 24 }}>
+              {['Commercial License', 'Instant Download', 'Lifetime Updates', 'Secure Razorpay Checkout', '24×7 Email Support'].map((chip) => (
+                <span key={chip} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: '#A8B3C2' }}>
+                  <span style={{ color: '#2A96A6', fontSize: 13 }}>✓</span>{chip}
+                </span>
               ))}
+            </div>
+
+            {/* ZONE 3 — social proof + support (subtle badges, divided off) */}
+            <div className="herobadges" style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', gap: 10, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,.08)' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '7px 14px', borderRadius: 12, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.09)' }}>
+                <span style={{ fontSize: 13 }}>🔥</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#A8B3C2' }}>Trusted by 12,000+ creators worldwide</span>
+              </div>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className="email-chip" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '7px 14px', borderRadius: 12, background: 'rgba(42,150,166,.12)', border: '1px solid rgba(42,150,166,.3)', textDecoration: 'none', transition: 'all .2s' }}>
+                <span style={{ fontSize: 13 }}>📨</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#36b6c9' }}>24×7 support: {SUPPORT_EMAIL}</span>
+              </a>
             </div>
           </div>
 
@@ -223,11 +251,6 @@ export default function Landing() {
           <div className="herovisual" style={{ position: 'relative', minHeight: 480, display: 'flex', alignItems: 'center' }}>
             <div style={{ position: 'absolute', top: 0, right: '-4%', width: 340, height: 340, borderRadius: '50%', background: `radial-gradient(circle,${hexA(av.accent, 0.22)},transparent 68%)`, filter: 'blur(34px)', transition: 'background .5s' }} />
             <div style={{ position: 'absolute', bottom: 0, left: 0, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle,rgba(42,150,166,.18),transparent 68%)', filter: 'blur(30px)' }} />
-            <div style={{ position: 'absolute', top: -14, right: 6, zIndex: 4, background: 'rgba(11,15,20,.85)', backdropFilter: 'blur(10px)', border: '1px solid rgba(244,197,66,.3)', borderRadius: 14, padding: '10px 16px', boxShadow: '0 16px 36px -12px rgba(0,0,0,.7)', animation: 'floaty 6s ease-in-out infinite' }}>
-              <div style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 20, color: '#F4C542', lineHeight: 1 }}>25,000+</div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: '#A8B3C2', marginTop: 2 }}>premium assets, one hub</div>
-            </div>
-
             <div style={{ position: 'relative', zIndex: 2, width: '100%', background: 'linear-gradient(155deg,rgba(26,36,48,.92),rgba(13,19,26,.92))', backdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 22, boxShadow: '0 40px 80px -28px rgba(0,0,0,.85)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px 18px', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -264,13 +287,13 @@ export default function Landing() {
                     <span style={{ fontSize: 13, color: '#dfe5ee' }}>Saves you about</span>
                     <span style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 16, color: av.accent, transition: 'color .4s' }}>{av.saves}</span>
                   </div>
-                  <button onClick={() => scrollTo('products')} style={{ cursor: 'pointer', fontFamily: 'Sora', fontWeight: 700, fontSize: 12.5, color: '#06222a', background: '#fff', border: 'none', borderRadius: 9, padding: '8px 14px', whiteSpace: 'nowrap' }}>View →</button>
+                  <button onClick={() => scrollTo(slug(av.name))} style={{ cursor: 'pointer', fontFamily: 'Sora', fontWeight: 700, fontSize: 12.5, color: '#06222a', background: '#fff', border: 'none', borderRadius: 9, padding: '8px 14px', whiteSpace: 'nowrap' }}>View →</button>
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 7, padding: '0 16px 14px' }}>
                 {vaultData.map((v, i) => (
-                  <button key={v.name} onClick={() => setActiveVault(i)} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '10px 4px', borderRadius: 11, background: i === activeVault ? hexA(v.accent, 0.16) : 'rgba(255,255,255,.04)', border: `1px solid ${i === activeVault ? hexA(v.accent, 0.5) : 'rgba(255,255,255,.08)'}`, color: i === activeVault ? '#fff' : '#A8B3C2', transition: 'all .25s' }}>
+                  <button key={v.name} onClick={() => { setActiveVault(i); scrollTo(slug(v.name)); }} title={`View ${v.name}`} style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '10px 4px', borderRadius: 11, background: i === activeVault ? hexA(v.accent, 0.16) : 'rgba(255,255,255,.04)', border: `1px solid ${i === activeVault ? hexA(v.accent, 0.5) : 'rgba(255,255,255,.08)'}`, color: i === activeVault ? '#fff' : '#A8B3C2', transition: 'all .25s' }}>
                     <span style={{ fontSize: 18 }}>{v.icon}</span>
                     <span style={{ fontSize: 10, fontWeight: 700, textAlign: 'center', lineHeight: 1.1 }}>{shortName(v.name)}</span>
                   </button>
@@ -286,7 +309,7 @@ export default function Landing() {
         </section>
 
         {/* STATS BAR */}
-        <section style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '30px auto 0', padding: '0 28px' }}>
+        <section className="statswrap" style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '30px auto 0', padding: '0 28px' }}>
           <div className="statsgrid" style={{ borderTop: '1px solid rgba(255,255,255,.08)', borderBottom: '1px solid rgba(255,255,255,.08)', padding: '36px 0', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 20 }}>
             {statsBase.map((b, i) => (
               <div key={b.label} style={{ textAlign: 'center' }}>
@@ -319,7 +342,7 @@ export default function Landing() {
 
             {/* TRUST */}
             <section style={{ padding: '50px 0' }}>
-              <div style={{ borderRadius: 24, background: 'linear-gradient(135deg,rgba(42,150,166,.1),rgba(212,160,23,.07))', border: '1px solid rgba(255,255,255,.1)', padding: '42px 38px' }}>
+              <div className="trustcard" style={{ borderRadius: 24, background: 'linear-gradient(135deg,rgba(42,150,166,.1),rgba(212,160,23,.07))', border: '1px solid rgba(255,255,255,.1)', padding: '42px 38px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 24, marginBottom: 30 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
@@ -354,10 +377,9 @@ export default function Landing() {
               </div>
               <div className="prodgrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 20 }}>
                 {productCards.map((p) => (
-                  <div key={p.name} className="prod-card" style={{ borderRadius: 20, overflow: 'hidden', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.09)', transition: 'all .28s', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', background: p.bg }}>
-                      <img src={p.img} alt={p.name} loading="lazy" decoding="async" className="img-fade" ref={(el) => { if (el?.complete) el.classList.add('is-loaded'); }} onLoad={(e) => e.currentTarget.classList.add('is-loaded')} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', top: 12, left: 12, padding: '5px 11px', borderRadius: 999, background: 'rgba(11,15,20,.8)', backdropFilter: 'blur(6px)', fontSize: 11, fontWeight: 700, letterSpacing: '.04em', color: '#F4C542', border: '1px solid rgba(244,197,66,.3)' }}>{p.tag}</div>
+                  <div key={p.name} id={slug(p.name)} className="prod-card" style={{ borderRadius: 20, overflow: 'hidden', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.09)', transition: 'all .28s', display: 'flex', flexDirection: 'column', scrollMarginTop: 96 }}>
+                    <div style={{ position: 'relative', overflow: 'hidden', background: '#0a0e13', padding: 14 }}>
+                      <img src={p.img} alt={p.name} loading="lazy" decoding="async" className="img-fade" ref={(el) => { if (el?.complete) el.classList.add('is-loaded'); }} onLoad={(e) => e.currentTarget.classList.add('is-loaded')} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', objectPosition: 'top center', display: 'block', borderRadius: 12 }} />
                     </div>
                     <div style={{ padding: 20, display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <div style={{ fontSize: 12, fontWeight: 600, color: '#2A96A6', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 6 }}>{p.category}</div>
@@ -372,6 +394,13 @@ export default function Landing() {
                           <div style={{ fontSize: 12, color: '#00C853', fontWeight: 600, marginTop: 2 }}>Member {p.member} · Save {p.save}</div>
                         </div>
                         <button onClick={() => buy({ name: p.name, icon: p.icon, desc: p.desc, original: p.original, offer: p.offer, member: p.member })} style={{ cursor: 'pointer', fontFamily: 'Sora', fontWeight: 700, fontSize: 14, color: '#06222a', background: 'linear-gradient(95deg,#F4C542,#D4A017)', border: 'none', borderRadius: 11, padding: '11px 18px', whiteSpace: 'nowrap' }}>Buy Now</button>
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px 12px', marginTop: 16, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,.07)' }}>
+                        {productPerks.map((tp) => (
+                          <span key={tp} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600, color: '#8b97a6' }}>
+                            <span style={{ color: '#00C853', fontSize: 10 }}>✓</span>{tp}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -457,7 +486,7 @@ export default function Landing() {
 
             {/* MEMBERSHIP */}
             <section id="membership" style={{ padding: '54px 0', scrollMarginTop: 90 }}>
-              <div style={{ position: 'relative', borderRadius: 26, overflow: 'hidden', border: '1px solid rgba(244,197,66,.25)', padding: '50px 44px', background: 'linear-gradient(135deg,#121821,#0d1a1d)' }}>
+              <div className="memcard" style={{ position: 'relative', borderRadius: 26, overflow: 'hidden', border: '1px solid rgba(244,197,66,.25)', padding: '50px 44px', background: 'linear-gradient(135deg,#121821,#0d1a1d)' }}>
                 <div style={{ position: 'absolute', top: '-40%', right: '-10%', width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle,rgba(244,197,66,.16),transparent 65%)', filter: 'blur(20px)' }} />
                 <div className="memgrid" style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1.2fr .8fr', gap: 40, alignItems: 'center' }}>
                   <div>
@@ -484,7 +513,7 @@ export default function Landing() {
                     </div>
                     <div style={{ fontSize: 13, color: '#00C853', fontWeight: 600, marginBottom: 22 }}>Lifetime access · No renewals</div>
                     <button onClick={openMembership} className="btn-primary" style={{ cursor: 'pointer', width: '100%', fontFamily: 'Sora', fontWeight: 700, fontSize: 16, color: '#06222a', background: 'linear-gradient(95deg,#F4C542,#D4A017)', border: 'none', borderRadius: 13, padding: 15, boxShadow: '0 12px 30px -8px rgba(244,197,66,.5)' }}>Become a Member</button>
-                    <div style={{ fontSize: 12, color: '#6b7686', marginTop: 14 }}>🔒 Secure payment · Instant signup link</div>
+                    <div style={{ fontSize: 12, color: '#6b7686', marginTop: 14 }}>🔒 Secure checkout via Razorpay · Instant signup link</div>
                   </div>
                 </div>
               </div>
@@ -565,9 +594,23 @@ export default function Landing() {
           </aside>
         </div>
 
+        {/* 24×7 SUPPORT BANNER */}
+        <section className="supportwrap" style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '10px auto 0', padding: '0 28px 36px' }}>
+          <div className="supportcard" style={{ borderRadius: 20, border: '1px solid rgba(42,150,166,.28)', background: 'linear-gradient(135deg,rgba(42,150,166,.12),rgba(244,197,66,.05))', padding: '24px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 13, background: 'rgba(42,150,166,.16)', border: '1px solid rgba(42,150,166,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>📨</div>
+              <div>
+                <div style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 18, marginBottom: 3 }}>Need help? We're on it 24×7.</div>
+                <div style={{ fontSize: 13.5, color: '#A8B3C2' }}>Email us anytime — setup help, downloads, refunds, anything. Replies usually within hours.</div>
+              </div>
+            </div>
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="btn-primary" style={{ fontFamily: 'Sora', fontWeight: 700, fontSize: 14.5, color: '#06222a', background: 'linear-gradient(95deg,#2A96A6,#36b6c9)', borderRadius: 12, padding: '13px 22px', textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 10px 26px -8px rgba(42,150,166,.5)' }}>✉️ {SUPPORT_EMAIL}</a>
+          </div>
+        </section>
+
         {/* FOOTER */}
         <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,.08)', marginTop: 40, background: 'rgba(18,24,33,.5)' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto', padding: '54px 28px 30px' }}>
+          <div className="footwrap" style={{ maxWidth: 1280, margin: '0 auto', padding: '54px 28px 30px' }}>
             <div className="footgrid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr 1fr', gap: 36, marginBottom: 40 }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 16 }}>
@@ -600,7 +643,7 @@ export default function Landing() {
         </footer>
 
         {/* FLOATING WIDGETS */}
-        <div className="floatcol" style={{ position: 'fixed', right: 22, top: '50%', transform: 'translateY(-50%)', zIndex: 55, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="floatcol" style={{ position: 'fixed', right: 22, bottom: 22, zIndex: 55, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <button onClick={() => setFaqOpen(true)} title="FAQ" style={{ cursor: 'pointer', width: 54, height: 54, borderRadius: 16, background: 'rgba(18,24,33,.85)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,.14)', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, boxShadow: '0 10px 28px -8px rgba(0,0,0,.6)' }}>
             <span style={{ fontSize: 18 }}>💬</span><span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.03em' }}>FAQ</span>
           </button>
@@ -667,7 +710,7 @@ export default function Landing() {
               </div>
               <div style={{ padding: 24 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
-                  {[{ icon: '💬', label: 'WhatsApp', sub: 'Chat with us' }, { icon: '✉️', label: 'Email', sub: 'hi@gwlhub.com' }].map((cc) => (
+                  {[{ icon: '💬', label: 'WhatsApp', sub: 'Chat with us' }, { icon: '✉️', label: 'Email', sub: SUPPORT_EMAIL }].map((cc) => (
                     <a key={cc.label} href="#top" style={{ display: 'flex', alignItems: 'center', gap: 11, padding: 14, borderRadius: 13, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)', textDecoration: 'none' }}>
                       <span style={{ fontSize: 20 }}>{cc.icon}</span>
                       <div><div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{cc.label}</div><div style={{ fontSize: 11, color: '#A8B3C2' }}>{cc.sub}</div></div>
@@ -726,15 +769,15 @@ export default function Landing() {
                     <span style={{ fontSize: 13, color: '#7Cffb0' }}>Become a member at checkout and pay just <b>{item.member}</b></span>
                   </div>
                   <button onClick={goPay} style={{ cursor: 'pointer', width: '100%', fontFamily: 'Sora', fontWeight: 700, fontSize: 16, color: '#06222a', background: 'linear-gradient(95deg,#F4C542,#D4A017)', border: 'none', borderRadius: 13, padding: 15, marginBottom: 10 }}>Continue to payment →</button>
-                  <div style={{ textAlign: 'center', fontSize: 12, color: '#6b7686' }}>🔒 No account required · Secure external checkout</div>
+                  <div style={{ textAlign: 'center', fontSize: 12, color: '#6b7686' }}>🔒 No account required · Secure checkout via Razorpay</div>
                 </div>
               )}
 
               {buyStep === 2 && (
                 <div style={{ padding: '50px 26px', textAlign: 'center' }}>
                   <div style={{ width: 60, height: 60, margin: '0 auto 22px', borderRadius: '50%', border: '4px solid rgba(42,150,166,.2)', borderTopColor: '#2A96A6', animation: 'spin .9s linear infinite' }} />
-                  <div style={{ fontFamily: 'Sora', fontWeight: 700, fontSize: 19, marginBottom: 8 }}>Redirecting to secure payment…</div>
-                  <div style={{ fontSize: 14, color: '#A8B3C2' }}>Powered by external payment gateway</div>
+                  <div style={{ fontFamily: 'Sora', fontWeight: 700, fontSize: 19, marginBottom: 8 }}>Redirecting to Razorpay…</div>
+                  <div style={{ fontSize: 14, color: '#A8B3C2' }}>Secure checkout · UPI, Cards, Wallets & Netbanking</div>
                 </div>
               )}
 
@@ -769,17 +812,25 @@ export default function Landing() {
 
       <style>{`
         html{scroll-behavior:smooth}
-        .nav-signin:hover{background:rgba(255,255,255,.12)!important}
+        .promo-row{scrollbar-width:none}
+        .promo-row::-webkit-scrollbar{display:none}
+        .nav-signin:hover{background:rgba(255,255,255,.08)!important;color:#fff!important}
+        .nav-cta:hover{color:#fbde7e!important}
+        .supportcard a:hover{transform:translateY(-2px)}
+        .email-chip:hover{background:rgba(42,150,166,.2)!important;border-color:rgba(42,150,166,.5)!important}
+        .herobadges>*{white-space:nowrap}
+        @media(max-width:1099px){.herobadges{flex-wrap:wrap!important}}
         .why-card:hover{background:rgba(255,255,255,.07)!important;transform:translateY(-4px);border-color:rgba(42,150,166,.4)!important}
         .prod-card:hover{transform:translateY(-5px);border-color:rgba(42,150,166,.45)!important;box-shadow:0 26px 50px -18px rgba(0,0,0,.7)}
         .bundle-row:hover{border-color:rgba(244,197,66,.4)!important;transform:translateY(-2px)}
-        @media(min-width:1024px){.livechip{display:flex!important}}
+        @media(min-width:1200px){.livechip{display:flex!important}}
         @media(max-width:1080px){
           .mainwrap{grid-template-columns:1fr!important}
           .sidebar{position:static!important;flex-direction:row!important;flex-wrap:wrap!important}
           .sidebar>div{flex:1;min-width:240px}
         }
         @media(max-width:900px){
+          .nav-cta{display:none!important}
           .herogrid{grid-template-columns:1fr!important;gap:32px!important;padding-top:120px!important}
           .herovisual{min-height:380px!important}
           .why4{grid-template-columns:repeat(2,1fr)!important}
@@ -791,13 +842,42 @@ export default function Landing() {
           .footgrid{grid-template-columns:1fr 1fr!important}
           .floatcol{top:auto!important;bottom:22px!important;transform:none!important}
           h1{font-size:46px!important}
+          /* Tablet gutters + calmer section rhythm */
+          .navwrap,.statswrap,.mainwrap,.supportwrap,.footwrap{padding-left:22px!important;padding-right:22px!important}
+          .mainwrap > main > section{padding-top:58px!important;padding-bottom:28px!important}
         }
         @media(max-width:560px){
           .why4{grid-template-columns:1fr!important}
           .bundlerow{grid-template-columns:1fr!important;text-align:center;gap:14px!important;justify-items:center}
           .bundlerow>div:last-child{align-items:center!important}
           .footgrid{grid-template-columns:1fr!important}
-          h1{font-size:38px!important}
+        }
+        @media(max-width:600px){
+          /* Tighten the page gutters so content isn't squeezed on phones */
+          .navwrap{padding:12px 16px!important;gap:12px!important}
+          .herogrid{padding:112px 16px 20px!important;gap:24px!important}
+          .statswrap{padding:0 16px!important}
+          .mainwrap{padding:0 16px!important;gap:24px!important}
+          .supportwrap{padding:0 16px 24px!important}
+          .supportcard{padding:20px 18px!important}
+          .footwrap{padding:40px 16px 26px!important}
+          .trustcard{padding:26px 18px!important}
+          .memcard{padding:32px 20px!important}
+          /* Calmer vertical rhythm between sections */
+          .mainwrap > main > section{padding-top:42px!important;padding-bottom:30px!important}
+          /* Hero body copy + chips */
+          .herogrid p{font-size:16px!important}
+          /* Scale the oversized inline numbers (divs, so not caught by global h*) */
+          .statsgrid > div > div:first-child{font-size:32px!important}
+          .statswrap{margin-top:14px!important}
+          .statsgrid{padding:24px 0!important}
+          /* Stats & trust read better as 2-up on phones */
+          .statsgrid,.trust4{grid-template-columns:repeat(2,1fr)!important}
+          /* Membership benefits stack to one column */
+          .memgrid > div:first-child > div:last-child{grid-template-columns:1fr!important}
+        }
+        @media(max-width:380px){
+          .statsgrid,.trust4{grid-template-columns:1fr!important}
         }
       `}</style>
     </>

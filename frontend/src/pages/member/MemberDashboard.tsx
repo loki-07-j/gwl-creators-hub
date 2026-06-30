@@ -87,7 +87,7 @@ export default function MemberDashboard() {
         {sidebarOpen && <div onClick={() => setSidebarOpen(false)} className="sb-backdrop" style={{ position: 'fixed', inset: 0, zIndex: 65, background: 'rgba(0,0,0,.5)' }} />}
 
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <header style={{ position: 'sticky', top: 0, zIndex: 40, backdropFilter: 'blur(14px)', background: 'rgba(11,15,20,.8)', borderBottom: '1px solid rgba(255,255,255,.07)', padding: '13px 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18 }}>
+          <header className="dash-header" style={{ position: 'sticky', top: 0, zIndex: 40, backdropFilter: 'blur(14px)', background: 'rgba(11,15,20,.8)', borderBottom: '1px solid rgba(255,255,255,.07)', padding: '13px 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
               <button onClick={() => setSidebarOpen((v) => !v)} className="menu-btn" style={{ cursor: 'pointer', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', color: '#fff', fontSize: 17, alignItems: 'center', justifyContent: 'center' }}>☰</button>
               <div style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 19, letterSpacing: '-.02em' }}>{titles[view]}</div>
@@ -100,12 +100,12 @@ export default function MemberDashboard() {
               <button onClick={() => go('notifications')} style={{ position: 'relative', cursor: 'pointer', width: 40, height: 40, borderRadius: 11, ...card, color: '#fff', fontSize: 16 }}>🔔{unread > 0 && <span style={{ position: 'absolute', top: 8, right: 9, width: 7, height: 7, borderRadius: '50%', background: '#FF5252', border: '2px solid #0B0F14' }} />}</button>
               <button onClick={() => go('profile')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 9, padding: '5px 12px 5px 5px', borderRadius: 999, ...card }}>
                 <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#2A96A6,#F4C542)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Sora', fontWeight: 700, fontSize: 13, color: '#06222a' }}>{initial}</div>
-                <span style={{ fontSize: 13, fontWeight: 600 }}>{user?.name}</span>
+                <span className="member-name" style={{ fontSize: 13, fontWeight: 600 }}>{user?.name}</span>
               </button>
             </div>
           </header>
 
-          <main key={view} className="fade-up" style={{ flex: 1, padding: '28px 26px 48px', maxWidth: 1160, width: '100%' }}>
+          <main key={view} className="fade-up dash-main" style={{ flex: 1, padding: '28px 26px 48px', maxWidth: 1160, width: '100%' }}>
             {view === 'dashboard' && <DashboardView name={user?.name ?? ''} go={go} notify={notify} />}
             {view === 'products' && <CatalogView go={go} notify={notify} />}
             {view === 'favourites' && <FavouritesView go={go} notify={notify} />}
@@ -135,7 +135,18 @@ export default function MemberDashboard() {
           .statcards{grid-template-columns:repeat(2,1fr)!important}.dashcols{grid-template-columns:1fr!important}.libgrid{grid-template-columns:repeat(2,1fr)!important}.couponsgrid{grid-template-columns:1fr!important}
         }
         @media(min-width:881px){.sb-backdrop{display:none!important}}
-        @media(max-width:560px){.statcards{grid-template-columns:1fr!important}.libgrid{grid-template-columns:1fr!important}}
+        @media(max-width:560px){
+          .statcards{grid-template-columns:1fr!important}.libgrid{grid-template-columns:1fr!important}
+          .member-name{display:none!important}
+        }
+        @media(max-width:600px){
+          .dash-header{padding:11px 16px!important;gap:12px!important}
+          .dash-main{padding:20px 16px 40px!important}
+          .dash-header > div:first-child{gap:10px!important}
+          /* Wide tables scroll horizontally instead of crushing */
+          .tablewrap{overflow-x:auto!important}
+          .tablerow{min-width:520px!important}
+        }
       `}</style>
     </>
   );
@@ -506,11 +517,11 @@ function InvoicesView({ notify }: { notify: Notify }) {
   return (
     <div>
       <div style={{ fontSize: 14, color: '#A8B3C2', marginBottom: 18 }}>Your purchase history and downloadable invoices.</div>
-      <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,.08)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr 1fr 1fr auto', gap: 14, padding: '14px 18px', background: 'rgba(255,255,255,.04)', fontSize: 11.5, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: '#6b7686' }}>
+      <div className="tablewrap" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,.08)' }}>
+        <div className="tablerow" style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr 1fr 1fr auto', gap: 14, padding: '14px 18px', background: 'rgba(255,255,255,.04)', fontSize: 11.5, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: '#6b7686' }}>
           <div>Invoice</div><div>Product</div><div>Amount</div><div>Status</div><div /></div>
         {(data as any[]).map((iv) => (
-          <div key={iv.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr 1fr 1fr auto', gap: 14, padding: '15px 18px', borderTop: '1px solid rgba(255,255,255,.06)', alignItems: 'center', fontSize: 13.5 }}>
+          <div key={iv.id} className="tablerow" style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr 1fr 1fr auto', gap: 14, padding: '15px 18px', borderTop: '1px solid rgba(255,255,255,.06)', alignItems: 'center', fontSize: 13.5 }}>
             <div><div style={{ fontWeight: 600 }}>{iv.invoiceNumber}</div><div style={{ fontSize: 11.5, color: '#6b7686' }}>{fullDate(iv.issuedAt)}</div></div>
             <div style={{ color: '#dfe5ee' }}>{iv.order?.items?.[0]?.label ?? '—'}</div>
             <div style={{ fontFamily: 'Sora', fontWeight: 700 }}>{rupee(iv.amount)}</div>

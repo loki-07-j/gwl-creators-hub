@@ -292,7 +292,7 @@ export default function AdminPortal() {
         {sidebarOpen && <div onClick={() => setSidebarOpen(false)} className="sb-backdrop" style={{ position: 'fixed', inset: 0, zIndex: 65, background: 'rgba(0,0,0,.5)' }} />}
 
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          <header style={{ position: 'sticky', top: 0, zIndex: 40, backdropFilter: 'blur(14px)', background: 'rgba(11,15,20,.8)', borderBottom: '1px solid rgba(255,255,255,.07)', padding: '13px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18 }}>
+          <header className="admin-header" style={{ position: 'sticky', top: 0, zIndex: 40, backdropFilter: 'blur(14px)', background: 'rgba(11,15,20,.8)', borderBottom: '1px solid rgba(255,255,255,.07)', padding: '13px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 18 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
               <button onClick={() => setSidebarOpen((v) => !v)} className="menu-btn" style={{ cursor: 'pointer', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', color: '#fff', fontSize: 17, alignItems: 'center', justifyContent: 'center' }}>☰</button>
               <div style={{ minWidth: 0 }}><div style={{ fontFamily: 'Sora', fontWeight: 800, fontSize: 19, letterSpacing: '-.02em' }}>{title}</div><div style={{ fontSize: 12.5, color: '#6b7686' }}>{sub}</div></div>
@@ -306,7 +306,7 @@ export default function AdminPortal() {
             </div>
           </header>
 
-          <main key={view} className="fade-up" style={{ flex: 1, padding: '24px', maxWidth: 1280, width: '100%' }}>
+          <main key={view} className="fade-up admin-main" style={{ flex: 1, padding: '24px', maxWidth: 1280, width: '100%' }}>
             {view === 'dashboard' && <DashboardView />}
             {view === 'products' && <ProductsView openEditor={openEditor} notify={notify} />}
             {view === 'editor' && <EditorView id={editingId} go={go} notify={notify} />}
@@ -338,6 +338,17 @@ export default function AdminPortal() {
           .kpi4{grid-template-columns:repeat(2,1fr)!important}.col2{grid-template-columns:1fr!important}.ed-grid{grid-template-columns:1fr!important}
         }
         @media(min-width:881px){.sb-backdrop{display:none!important}}
+        @media(max-width:1024px){
+          .admin-header{padding:12px 18px!important}
+          .admin-main{padding:18px 18px 36px!important}
+          /* Data tables scroll sideways (tablets + phones) rather than crushing columns */
+          .admin-main div:has(> .arow){overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+          .admin-main div:has(> .arow) > div{min-width:700px}
+        }
+        @media(max-width:600px){
+          .admin-header{padding:11px 14px!important}
+          .admin-main{padding:16px 14px 34px!important}
+        }
         @media(max-width:560px){.kpi4{grid-template-columns:1fr!important}.signup-label,.admin-name{display:none}}
       `}</style>
     </>
